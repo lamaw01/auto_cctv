@@ -6,6 +6,9 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import os
 from time import ctime
+#import xlsxwriter
+from openpyxl import Workbook
+from openpyxl import load_workbook
 
 #web elements
 login_button_element = '//*[@id="login"]/table/tbody/tr/td[2]/div/div[5]/button'
@@ -24,8 +27,6 @@ camera_ip_element = '//*[@id="tableDigitalChannels"]/div/div[2]/div[1]/span[4]'
 #/span[8] -> camera status
 camera_status_element = '//*[@id="tableDigitalChannels"]/div/div[2]/div[1]/span[8]'
 
-
-global timeout
 timeout = 5
 
 #open nvr viewer
@@ -37,9 +38,13 @@ def open_viewer():
 
    try:
       chrome_options = Options()
-      chrome_options.add_argument("--incognito")
+      #chrome_options.add_argument("--incognito")
       chrome_options.add_experimental_option("detach", True)
+
+      global nvr_driver
       nvr_driver = webdriver.Chrome(options=chrome_options)
+      
+      #set position and size
       nvr_driver.set_window_size(1200, 1000)
       nvr_driver.get(nvr_ip)
 
@@ -57,113 +62,116 @@ def open_viewer():
 
       #run 24/7
       while True:
-         cycle_table(nvr_driver)
+         scan()
          #refresh page
          nvr_driver.refresh()
-         time.sleep(60)
+         time.sleep(180)
 
    except Exception as e:
       print('error opening viewer',e)
 
 #check table if there's offline
-def cycle_table(driver):
+def scan():
    camera_count = 0
    is_tail = False
    while is_tail is False:
       try:
          #click row
-         driver.find_element(By.XPATH,table_row + str([camera_count+1])).click()
+         nvr_driver.find_element(By.XPATH,table_row + str([camera_count+1])).click()
          camera_count = camera_count + 1
-         print('camera count',camera_count)
          
          #get name and status of current row
-         camera_name = driver.find_element(By.XPATH,table_row + str([camera_count]) + '/span[3]').text
-         camera_status = driver.find_element(By.XPATH,table_row + str([camera_count]) + '/span[8]').text
-         
+         global camera_name
+         camera_name = nvr_driver.find_element(By.XPATH,table_row + str([camera_count]) + '/span[3]').text
+         global camera_ip
+         camera_ip = nvr_driver.find_element(By.XPATH,table_row + str([camera_count])  + '/span[4]').text
+         camera_status = nvr_driver.find_element(By.XPATH,table_row + str([camera_count]) + '/span[8]').text
+
          #if offline, get ip and reboot
          if camera_status != 'Online':
-            #select ip element and reboot
-            ip_selected = driver.find_element(By.XPATH,table_row + str([camera_count])  + '/span[4]').text
-            ip_link = 'http://' + ip_selected
-
-            write_logs(camera_name)
-            reboot(ip_link)
+            #write_logs(camera_name)
+            open_page('http://' + camera_ip)
 
       except Exception as e:
          is_tail = True
          print(is_tail,e)
-    
-   print('camera limit count ',camera_count)
 
-#open ip cam and try reboot
-def reboot(ip):
+#open ip cam page
+def open_page(ip):
    try:
       chrome_options = Options()
-      chrome_options.add_argument("--incognito")
+      #chrome_options.add_argument("--incognito")
       chrome_options.add_experimental_option("detach", True)
-      driver = webdriver.Chrome(options=chrome_options)
+
+      global cam_driver
+      cam_driver = webdriver.Chrome(options=chrome_options)
 
       #set position and size
-      driver.set_window_size(1200, 1000)
-      driver.set_window_position(350, 20, windowHandle='current')
+      cam_driver.set_window_size(1200, 1000)
+      cam_driver.set_window_position(350, 20, windowHandle='current')
 
-      driver.get(ip)
+      cam_driver.get(ip)
 
-      wait_for_element_load(login_button_element,driver)
-      login(driver)
-      time.sleep(timeout)
-
-      wait_for_element_load(config_element,driver)
-      driver.find_element(By.XPATH, config_element).click()
-
-      wait_for_element_load(maintenance_element,driver)
-      driver.find_element(By.XPATH,maintenance_element).click()
-
-      wait_for_element_load(reboot_button_element,driver)
-      driver.find_element(By.XPATH,reboot_button_element).click()
-
-      wait_for_element_load(reboot_ok_button_element,driver)
-      driver.find_element(By.XPATH,reboot_ok_button_element).click()
-   
-      time.sleep(timeout)
+      #check if webpage is old layout
+      if ip != 'http://192.168.74.114' or ip != 'http://192.168.65.14' or ip != 'http://192.168.78.113':
+         reboot()
       
    except Exception as e:
       print('reboot camera error',e)
    
    finally:
       #close current browser
-      driver.close()
+      cam_driver.close()
+      write_excel(camera_name,camera_ip)
 
-#write logs
-def write_logs(cam_name):
-   is_file_exist = os.path.isfile('logs.txt')
+def write_excel(name,ip):
+   file_name = 'logs.xlsx'
+   new_row = [ctime(), ip, name]
+   is_file_exist = os.path.isfile(file_name)
    if is_file_exist:
-      with open('logs.txt', 'a') as f:
-         f.write('\n' + cam_name + ' -> ' + ctime())
+      wb = load_workbook(file_name)
+      ws = wb.active
+      ws.append(new_row)
    else:
-      with open('logs.txt', 'w') as f:
-         f.write('\n' + cam_name + ' -> ' + ctime())
+      wb = Workbook()
+      ws = wb.active
+      ws.append(['Date', 'Ip', 'Name'])
+      ws.append(new_row)
+      
+   wb.save(file_name)
 
-
-def login(driver):
+def reboot():
    #credentials of selected ip cam
    username = 'admin'
    password1 = '123456@ad'
    password2 = 'scores135792468'
-
-   pre_login_url = driver.current_url
-   #login using first password
-   driver.find_element(By.ID,'username').send_keys(username)
-   driver.find_element(By.ID,'password').send_keys(password1)
-   driver.find_element(By.XPATH,login_button_element).click()
    
    time.sleep(timeout)
-   post_login_url = driver.current_url
+   wait_for_element_load(login_button_element,cam_driver)
+
+   pre_login_url = cam_driver.current_url
+   #login using first password
+   cam_driver.find_element(By.ID,'username').send_keys(username)
+   cam_driver.find_element(By.ID,'password').send_keys(password1)
+   cam_driver.find_element(By.XPATH,login_button_element).click()
+   
+   time.sleep(timeout)
+   post_login_url = cam_driver.current_url
    #check if password is error
    if pre_login_url == post_login_url:
-      driver.find_element(By.ID,'username').send_keys(username)
-      driver.find_element(By.ID,'password').send_keys(password2)
-      driver.find_element(By.XPATH,login_button_element).click()
+      cam_driver.find_element(By.ID,'username').send_keys(username)
+      cam_driver.find_element(By.ID,'password').send_keys(password2)
+      cam_driver.find_element(By.XPATH,login_button_element).click()
+
+   time.sleep(timeout)
+   wait_for_element_load(config_element,cam_driver)
+   cam_driver.find_element(By.XPATH, config_element).click()
+   wait_for_element_load(maintenance_element,cam_driver)
+   cam_driver.find_element(By.XPATH,maintenance_element).click()
+   wait_for_element_load(reboot_button_element,cam_driver)
+   cam_driver.find_element(By.XPATH,reboot_button_element).click()
+   wait_for_element_load(reboot_ok_button_element,cam_driver)
+   cam_driver.find_element(By.XPATH,reboot_ok_button_element).click()
 
 #function to ensure web element loaded
 def wait_for_element_load(element, driver):
@@ -172,4 +180,3 @@ def wait_for_element_load(element, driver):
    time.sleep(timeout)
 
 open_viewer()
-#reboot('http://192.168.69.107')
