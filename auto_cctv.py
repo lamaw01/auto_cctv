@@ -6,9 +6,11 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import os
 from time import ctime
-#import xlsxwriter
+from time import strftime
 from openpyxl import Workbook
 from openpyxl import load_workbook
+from datetime import datetime, timedelta
+from threading import Timer
 
 #web elements
 login_button_element = '//*[@id="login"]/table/tbody/tr/td[2]/div/div[5]/button'
@@ -29,13 +31,15 @@ camera_status_element = '//*[@id="tableDigitalChannels"]/div/div[2]/div[1]/span[
 
 timeout = 5
 
+def init():
+   try:
+      print('')
+   except Exception as e:
+      print('error opening viewer',e)
+
 #open nvr viewer
 def open_viewer():
-   #credentials of nvr
    nvr_ip = 'http://172.21.0.198/'
-   nvr_username = 'admin'
-   nvr_password = 'uc-1enviar'
-
    try:
       chrome_options = Options()
       #chrome_options.add_argument("--incognito")
@@ -48,27 +52,37 @@ def open_viewer():
       nvr_driver.set_window_size(1200, 1000)
       nvr_driver.get(nvr_ip)
 
-      wait_for_element_load(login_button_element,nvr_driver)
-      nvr_driver.find_element(By.ID,'username').send_keys(nvr_username)
-      nvr_driver.find_element(By.ID,'password').send_keys(nvr_password)
-      nvr_driver.find_element(By.XPATH,login_button_element).click()
-
-      wait_for_element_load(config_element,nvr_driver)
-      nvr_driver.find_element(By.XPATH, config_element).click()
-
-      wait_for_element_load(camera_management_element,nvr_driver)
-      nvr_driver.find_element(By.XPATH,camera_management_element).click()
-      time.sleep(timeout)
+      login_nvr()
 
       #run 24/7
       while True:
          scan()
          #refresh page
          nvr_driver.refresh()
-         time.sleep(180)
+         #check if viewer got logout
+         time.sleep(30)
+         if nvr_driver.current_url.__contains__('http://172.21.0.198/doc/page/login.asp?'):
+           login_nvr()
+         #wait 2:30 sesc before refresh page
+         time.sleep(150)
 
    except Exception as e:
       print('error opening viewer',e)
+
+def login_nvr():
+   nvr_username = 'admin'
+   nvr_password = 'uc-1enviar'
+   wait_for_element_load(login_button_element,nvr_driver)
+   nvr_driver.find_element(By.ID,'username').send_keys(nvr_username)
+   nvr_driver.find_element(By.ID,'password').send_keys(nvr_password)
+   nvr_driver.find_element(By.XPATH,login_button_element).click()
+
+   wait_for_element_load(config_element,nvr_driver)
+   nvr_driver.find_element(By.XPATH, config_element).click()
+
+   wait_for_element_load(camera_management_element,nvr_driver)
+   nvr_driver.find_element(By.XPATH,camera_management_element).click()
+   time.sleep(timeout)
 
 #check table if there's offline
 def scan():
