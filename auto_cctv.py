@@ -44,15 +44,17 @@ def open_viewer():
          scan()
          #refresh page
          nvr_driver.refresh()
-         time.sleep(30)
+         time.sleep(timeout)
          #check if viewer got logged out
          if nvr_driver.current_url != 'http://172.21.0.198/doc/page/config.asp':
            print('logged out...', True)
            login_nvr()
-         #wait 2:30 sesc before refresh page
-         time.sleep(150)
+         #wait 2:00 sesc before refresh page
+         time.sleep(120)
    except Exception as e:
       print('error opening viewer',e)
+      nvr_driver.close()
+      open_viewer()
 
 def login_nvr():
    print('logging in viewer...')
