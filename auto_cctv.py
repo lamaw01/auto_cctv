@@ -94,8 +94,7 @@ def scan():
       except Exception as e:
          is_tail = True
          print(is_tail,e)
-      finally:
-         print('standby...')
+   print('standby...')
 
 #open ip cam page
 def open_page(ip):
