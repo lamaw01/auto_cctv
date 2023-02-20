@@ -36,7 +36,8 @@ def open_viewer():
       global nvr_driver
       nvr_driver = webdriver.Chrome(options=chrome_options)
       #set position and size
-      nvr_driver.set_window_size(1280, 720)
+      #nvr_driver.set_window_size(1280, 720)
+      nvr_driver.set_window_size(1152, 648)
       nvr_driver.get(nvr_ip)
       login_nvr()
       #run 24/7
@@ -93,6 +94,8 @@ def scan():
       except Exception as e:
          is_tail = True
          print(is_tail,e)
+      finally:
+         print('standby...')
 
 #open ip cam page
 def open_page(ip):
