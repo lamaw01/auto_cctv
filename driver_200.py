@@ -87,7 +87,7 @@ def scan():
          camera_ip = driver_200.find_element(By.XPATH,table_row + str([camera_count])  + '/td[4]/div/div').text
          camera_status = driver_200.find_element(By.XPATH,table_row + str([camera_count]) + '/td[8]/div').text
          #if offline, get ip and reboot
-         if not _cam_list.__contains__(camera_ip) and camera_status == 'Online':
+         if not _cam_list.__contains__(camera_ip) and camera_status != 'Online':
             bridge.reboot(camera_ip,camera_name,x,y)
       except Exception as e:
          is_tail = True
