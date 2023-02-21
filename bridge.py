@@ -19,7 +19,7 @@ reboot_button_element = '//*[@id="maintainUpgrade"]/div[1]/div[2]/span[1]/button
 reboot_ok_button_element = '//*[@id="config"]/div[1]/div/table/tbody/tr[2]/td[2]/div/table/tbody/tr[3]/td/div/button[1]'
 
 #open ip cam page
-def reboot(ip,name,x,y):
+def reboot(ip,name,x,y,nvr):
    print('accessing...',name)
    try:
       chrome_options = Options()
@@ -66,7 +66,7 @@ def reboot(ip,name,x,y):
       #close current browser
       cam_driver.close()
       #write log
-      write_excel(ip,name,success,198)
+      write_excel(ip,name,success,nvr)
       print('is rebooted?..'+name,success)
 
 #function to ensure web element loaded
