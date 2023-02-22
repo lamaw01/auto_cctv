@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options
 import time
 import bridge
 import requests
+from db_connect import insert_log
 
 #web elements for page 200
 username_input_element = '//*[@id="portal"]/div/div/div/div[2]/div/div/form/div[1]/div/div/input'
@@ -23,7 +24,7 @@ x = 770
 y = 390
 
 #list of cam to ignore
-_cam_list = ['192.168.74.114','172.21.0.216','172.21.0.74']
+_cam_list = ['172.21.0.216','172.21.0.74']
 
 #open nvr 200
 def open_admin_200():
@@ -81,22 +82,35 @@ def scan():
          driver_200.find_element(By.XPATH,table_row + str([camera_count+1])).click()
          camera_count = camera_count + 1
          #get name and status of current row
-         global camera_name
          camera_name = driver_200.find_element(By.XPATH,table_row + str([camera_count]) + '/td[3]/div/div').text
-         global camera_ip
          camera_ip = driver_200.find_element(By.XPATH,table_row + str([camera_count])  + '/td[4]/div/div').text
          camera_status = driver_200.find_element(By.XPATH,table_row + str([camera_count]) + '/td[8]/div').text
          #if offline, get ip and reboot
          if not _cam_list.__contains__(camera_ip) and camera_status != 'Online':
-            if camera_ip == '192.168.74.114':
-               #reboot_uptown_csr()
-               print('csr')
-            else:
-               bridge.reboot(camera_ip,camera_name,x,y,200)
-            
+           print('rebooting...',camera_name)
+           reboot(camera_ip,camera_name)
       except Exception as e:
          is_tail = True
          print('scan',e)
    print('standby...')
+
+#reboot ip cam using url
+def reboot(ip,name):
+   status = True
+   try:
+      #http://admin:scores135792468@192.168.64.112/ISAPI/System/reboot
+      response = requests.put('http://'+ip+'/ISAPI/System/reboot',auth=('admin','123456@ad'))
+      print('1st req',response.status_code)
+      time.sleep(10)
+      if response.status_code != 200:
+         time.sleep(10)
+         response = requests.put('http://'+ip+'/ISAPI/System/reboot',auth=('admin','scores135792468'))
+         print('2st req',response.status_code)
+   except Exception as e:
+      print('reboot',e)
+      status = False
+   finally:
+      print(response.text)
+      insert_log(ip,name,status,200)
 
 open_admin_200()

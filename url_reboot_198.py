@@ -3,6 +3,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import time
 import bridge
+import requests
+from db_connect import insert_log
 
 #web elements
 login_button_element = '//*[@id="login"]/table/tbody/tr/td[2]/div/div[5]/button'
@@ -78,17 +80,34 @@ def scan():
          driver_198.find_element(By.XPATH,table_row + str([camera_count+1])).click()
          camera_count = camera_count + 1
          #get name and status of current row
-         global camera_name
          camera_name = driver_198.find_element(By.XPATH,table_row + str([camera_count]) + '/span[3]').text
-         global camera_ip
          camera_ip = driver_198.find_element(By.XPATH,table_row + str([camera_count])  + '/span[4]').text
          camera_status = driver_198.find_element(By.XPATH,table_row + str([camera_count]) + '/span[8]').text
          #if offline, get ip and reboot
          if _cam_list.__contains__(camera_ip) and camera_status != 'Online':
-            bridge.reboot(camera_ip,camera_name,x,y,198)
+            print('rebooting...',camera_name)
+            reboot(camera_ip,camera_name)
       except Exception as e:
          is_tail = True
          print('scan',e)
    print('standby...')
+
+def reboot(ip,name):
+   status = True
+   try:
+      #http://admin:scores135792468@192.168.64.112/ISAPI/System/reboot
+      response = requests.put('http://'+ip+'/ISAPI/System/reboot',auth=('admin','123456@ad'))
+      print('1st req',response.status_code)
+      time.sleep(10)
+      if response.status_code != 200:
+         time.sleep(10)
+         response = requests.put('http://'+ip+'/ISAPI/System/reboot',auth=('admin','scores135792468'))
+         print('2st req',response.status_code)
+   except Exception as e:
+      print('reboot',e)
+      status = False
+   finally:
+      print(response.text)
+      insert_log(ip,name,status,200)
 
 open_admin_198()
