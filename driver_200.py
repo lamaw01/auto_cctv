@@ -42,15 +42,15 @@ def open_admin_200():
       #run 24/7
       while True:
          scan()
-         #refresh page
-         driver_200.refresh()
-         time.sleep(timeout)
          #check if viewer got logged out
          if driver_200.current_url == 'http://172.21.0.200/doc/index.html#/portal/login':
             print('logged out...', True)
             login_200()
-         #wait 2:00 sesc before refresh page
-         time.sleep(120)
+         #wait 5:00 mins before refresh page
+         time.sleep(300)
+         #refresh page
+         driver_200.refresh()
+         time.sleep(30)
    except Exception as e:
       print('error admin 200',e)
       driver_200.close()

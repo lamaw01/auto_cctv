@@ -39,15 +39,15 @@ def open_admin_198():
       #run 24/7
       while True:
          scan()
-         #refresh page
-         driver_198.refresh()
-         time.sleep(timeout)
          #check if viewer got logged out
          if driver_198.current_url != 'http://172.21.0.198/doc/page/config.asp':
             print('logged out...', True)
             login_198()
-         #wait 2:00 sesc before refresh page
-         time.sleep(120)
+         #wait 5:00 sesc before refresh page
+         time.sleep(300)
+         #refresh page
+         driver_198.refresh()
+         time.sleep(30)
    except Exception as e:
       print('error admin 198',e)
       driver_198.close()

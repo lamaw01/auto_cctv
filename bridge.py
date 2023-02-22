@@ -58,7 +58,7 @@ def reboot(ip,name,x,y,nvr):
          cam_driver.find_element(By.XPATH,reboot_button_element).click()
          wait_for_element_load(reboot_ok_button_element,cam_driver)
          cam_driver.find_element(By.XPATH,reboot_ok_button_element).click()
-         time.sleep(timeout)
+         time.sleep(15)
    except Exception as e:
       print('reboot camera error',e)
       success = False
