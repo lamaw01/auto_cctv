@@ -107,7 +107,6 @@ def reboot(ip,name):
       print('reboot',e)
       status = False
    finally:
-      print(response.text)
       insert_log(ip,name,status,200)
 
 open_admin_198()
