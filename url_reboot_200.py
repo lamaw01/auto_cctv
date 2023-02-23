@@ -20,8 +20,8 @@ table_row = '//*[@id="config"]/div[2]/div[2]/div/div/div[2]/div/div/div/div[2]/d
 #/td[3]/div/div -> name
 
 timeout = 5
-x = 770
-y = 390
+x = 0
+y = 10
 
 #list of cam to ignore
 _cam_list = ['172.21.0.216','172.21.0.74']

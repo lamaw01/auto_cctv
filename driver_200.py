@@ -3,7 +3,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import time
 import bridge
-import requests
 
 #web elements for page 200
 username_input_element = '//*[@id="portal"]/div/div/div/div[2]/div/div/form/div[1]/div/div/input'
@@ -19,8 +18,8 @@ table_row = '//*[@id="config"]/div[2]/div[2]/div/div/div[2]/div/div/div/div[2]/d
 #/td[3]/div/div -> name
 
 timeout = 5
-x = 770
-y = 390
+x = 0
+y = 10
 
 #list of cam to ignore
 _cam_list = ['192.168.74.114','172.21.0.216','172.21.0.74']
