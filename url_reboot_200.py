@@ -24,7 +24,7 @@ x = 0
 y = 10
 
 #list of cam to ignore
-_cam_list = ['172.21.0.216','172.21.0.74']
+_cam_list = ['172.21.0.216','172.21.0.74','192.168.69.107']
 
 #open nvr 200
 def open_admin_200():
@@ -61,6 +61,7 @@ def login_200():
    print('logging in 200...')
    nvr_username = 'admin'
    nvr_password = 'uc-1enviar'
+   time.sleep(timeout)
    bridge.wait_for_element_load(login_200_button_element,driver_200)
    driver_200.find_element(By.XPATH,username_input_element).send_keys(nvr_username)
    driver_200.find_element(By.XPATH,password_input_element).send_keys(nvr_password)

@@ -59,6 +59,7 @@ def login_198():
    print('logging in 198...')
    nvr_username = 'admin'
    nvr_password = 'uc-1enviar'
+   time.sleep(timeout)
    bridge.wait_for_element_load(login_button_element,driver_198)
    driver_198.find_element(By.ID,'username').send_keys(nvr_username)
    driver_198.find_element(By.ID,'password').send_keys(nvr_password)
