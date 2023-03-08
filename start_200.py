@@ -24,7 +24,8 @@ x = 0
 y = 10
 
 #list of cam to ignore
-_cam_list = ['172.21.0.216','172.21.0.74','192.168.69.107']
+#add more ip if desired to be ignore
+_cam_list = ['172.21.0.74','192.168.69.107']
 
 #open nvr 200
 def open_admin_200():
