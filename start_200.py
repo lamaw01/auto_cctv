@@ -1,10 +1,13 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import mysql.connector
 import time
-import bridge
 import requests
-from db_connect import insert_log
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 #web elements for page 200
 username_input_element = '//*[@id="portal"]/div/div/div/div[2]/div/div/form/div[1]/div/div/input'
@@ -19,9 +22,10 @@ table_row = '//*[@id="config"]/div[2]/div[2]/div/div/div[2]/div/div/div/div[2]/d
 #/td[4]/div/div -> ip
 #/td[3]/div/div -> name
 
-timeout = 5
+timeout = 6
+
 x = 0
-y = 10
+y = 390
 
 #list of cam to ignore
 #add more ip if desired to be ignore
@@ -29,13 +33,13 @@ _cam_list = ['172.21.0.74','192.168.69.107']
 
 #open nvr 200
 def open_admin_200():
-   nvr_ip = 'http://172.21.0.200/'
+   nvr_ip = 'http://172.21.0.200'
    try:
       chrome_options = Options()
       #chrome_options.add_argument("--incognito")
       chrome_options.add_experimental_option("detach", True)
       global driver_200
-      driver_200 = webdriver.Chrome(options=chrome_options)
+      driver_200 = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
       #set position and size
       driver_200.set_window_size(1152, 648)
       driver_200.set_window_position(x, y)
@@ -64,13 +68,13 @@ def login_200():
    nvr_username = 'admin'
    nvr_password = 'uc-1enviar'
    time.sleep(timeout)
-   bridge.wait_for_element_load(login_200_button_element,driver_200)
+   wait_for_element_load(login_200_button_element,driver_200)
    driver_200.find_element(By.XPATH,username_input_element).send_keys(nvr_username)
    driver_200.find_element(By.XPATH,password_input_element).send_keys(nvr_password)
    driver_200.find_element(By.XPATH,login_200_button_element).click()
-   bridge.wait_for_element_load(config_element,driver_200)
+   wait_for_element_load(config_element,driver_200)
    driver_200.find_element(By.XPATH,config_element).click()
-   bridge.wait_for_element_load(camera_management_element,driver_200)
+   wait_for_element_load(camera_management_element,driver_200)
    driver_200.find_element(By.XPATH,camera_management_element).click()
    time.sleep(timeout)
 
@@ -114,5 +118,34 @@ def reboot(ip,name):
       status = False
    finally:
       insert_log(ip,name,status,200)
+
+#function to ensure web element loaded
+def wait_for_element_load(element, driver):
+   element_wait_load = EC.presence_of_element_located((By.XPATH, element))
+   WebDriverWait(driver, 10).until(element_wait_load)
+   time.sleep(timeout)
+
+def insert_log(ip,name,rebooted,nvr):
+   try:
+      #connect db
+      _mydb = mysql.connector.connect(
+         host="172.21.3.25",
+         database="autocctv",
+         user="autocctv",
+         password="autocctv123"
+      )
+      cursor = _mydb.cursor()
+      #insert query
+      sql = "INSERT INTO logs (ip,name,rebooted,nvr) VALUES (%s,%s,%s,%s)"
+      val = (ip,name,rebooted,nvr)
+      cursor.execute(sql, val)
+      _mydb.commit()
+      print(cursor.rowcount, "record inserted.")
+   except mysql.connector.Error as err:
+      print('insert_log',err)
+   finally:
+      #close connection
+      cursor.close()
+      _mydb.close()
 
 open_admin_200()
