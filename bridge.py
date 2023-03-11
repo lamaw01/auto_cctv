@@ -5,6 +5,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import os
+import glob
+import shutil
 from time import ctime
 from openpyxl import Workbook
 from openpyxl import load_workbook
@@ -90,3 +92,10 @@ def write_excel(ip,name,status,nvr):
       ws.append(['Date', 'Ip', 'Name','Rebooted','NVR'])
       ws.append(new_row)
    wb.save(file_name)
+
+def delete_scoped():
+   try:
+      for f in glob.glob(r"C:\Program Files (x86)\scoped_dir*"):
+         shutil.rmtree(f)
+   except Exception as e:
+         print(e)

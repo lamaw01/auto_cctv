@@ -55,7 +55,8 @@ def open_admin_200():
          time.sleep(30)
    except Exception as e:
       print('admin 200',e)
-      driver_200.close()
+      # driver_200.close()
+      driver_200.quit()
       open_admin_200()
 
 def login_200():
