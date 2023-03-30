@@ -29,7 +29,8 @@ y = 390
 
 #list of cam to ignore
 #add more ip if desired to be ignore
-_cam_list = ['172.21.0.74','192.168.69.107']
+_cam_list = []
+_to_ignore_log = ['192.168.69.107','192.168.69.108','192.168.69.111']
 
 #open nvr 200
 def open_admin_200():
@@ -117,7 +118,8 @@ def reboot(ip,name):
       print('reboot',e)
       status = False
    finally:
-      insert_log(ip,name,status,200)
+      if not _to_ignore_log.__contains__(ip):
+         insert_log(ip,name,status,200)
 
 #function to ensure web element loaded
 def wait_for_element_load(element, driver):
