@@ -29,7 +29,8 @@ y = 390
 
 #list of cam to ignore
 #add more ip if desired to be ignore
-_cam_list = []
+_cam_list = ['172.21.0.216']
+#'172.21.0.74','172.21.0.216'
 _to_ignore_log = ['192.168.69.107','192.168.69.108','192.168.69.111']
 
 #open nvr 200
