@@ -22,6 +22,8 @@ table_row = '//*[@id="config"]/div[2]/div[2]/div/div/div[2]/div/div/div/div[2]/d
 #/td[4]/div/div -> ip
 #/td[3]/div/div -> name
 
+next_page = '//*[@id="config"]/div[2]/div[2]/div/div/div[2]/div/div/div/div[3]/div/div/button[2]/i'
+
 timeout = 6
 
 x = 0
@@ -29,9 +31,9 @@ y = 390
 
 #list of cam to ignore
 #add more ip if desired to be ignore
-_cam_list = ['172.21.0.216']
-#'172.21.0.74','172.21.0.216'
-_to_ignore_log = ['192.168.69.107','192.168.69.108','192.168.69.111']
+_cam_list = []
+#'172.21.0.74','172.21.0.216,'192.168.69.107','192.168.69.108','192.168.69.111'
+_to_ignore_log = ['172.21.0.242','192.168.70.116','172.21.0.241','172.21.0.250']
 
 #open nvr 200
 def open_admin_200():
@@ -101,7 +103,37 @@ def scan():
       except Exception as e:
          is_tail = True
          print('scan',e)
+         if is_tail is True:
+            print('navigate to 2nd page...')
+            try:
+               driver_200.find_element(By.XPATH,next_page).click()
+               scan2()
+            except Exception as e:
+               print('no 2nd page...')
    print('standby...')
+
+#check table if there's offline
+def scan2():
+   print('scanning2...')
+   camera_count = 0
+   is_tail = False
+   while is_tail is False:
+      try:
+         #click row
+         driver_200.find_element(By.XPATH,table_row + str([camera_count+1])).click()
+         camera_count = camera_count + 1
+         #get name and status of current row
+         camera_name = driver_200.find_element(By.XPATH,table_row + str([camera_count]) + '/td[3]/div/div').text
+         camera_ip = driver_200.find_element(By.XPATH,table_row + str([camera_count])  + '/td[4]/div/div').text
+         camera_status = driver_200.find_element(By.XPATH,table_row + str([camera_count]) + '/td[8]/div').text
+         #if offline, get ip and reboot
+         if not _cam_list.__contains__(camera_ip) and camera_status != 'Online':
+           print('rebooting2...',camera_name)
+           reboot(camera_ip,camera_name)
+      except Exception as e:
+         is_tail = True
+         print('scan2',e)
+   print('standby2...')
 
 #reboot ip cam using url
 def reboot(ip,name):
