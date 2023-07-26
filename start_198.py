@@ -93,7 +93,7 @@ def scan():
          camera_ip = driver_198.find_element(By.XPATH,table_row + str([camera_count])  + '/span[4]').text
          camera_status = driver_198.find_element(By.XPATH,table_row + str([camera_count]) + '/span[8]').text
          #if offline, get ip and reboot
-         if not _cam_list.__contains__(camera_ip) and camera_status != 'Online':
+         if _cam_list.__contains__(camera_ip) and camera_status != 'Online':
             print('rebooting...',camera_name)
             reboot(camera_ip,camera_name)
       except Exception as e:
