@@ -6,8 +6,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import mysql.connector
 import time
 import requests
-#from selenium.webdriver.chrome.service import Service
-#from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 #web elements
 login_button_element = '//*[@id="login"]/table/tbody/tr/td[2]/div/div[5]/button'
@@ -29,7 +29,7 @@ y = 10
 #list of cam to scan
 # _cam_list = ['192.168.62.114','172.21.0.223','172.21.0.221','192.168.74.115','192.168.72.116','172.21.0.224','172.21.0.243','192.168.60.139','192.168.69.110','192.168.76.108','192.168.77.115','192.168.64.111','172.21.0.254','192.168.60.114']
 # _cam_list = ['192.168.71.118','192.168.67.117','192.168.74.114','192.168.62.113','192.168.73.115','192.168.73.114','192.168.60.137','192.168.64.112','192.168.60.114','192.168.70.116','192.168.69.107','192.168.69.109','192.168.65.109','192.168.63.115','192.168.68.110']
-_cam_list = ['192.168.62.114','172.21.0.223','172.21.0.221','192.168.74.115','192.168.72.116','172.21.0.224','172.21.0.243','192.168.60.139','192.168.69.110','192.168.76.108','192.168.77.115','192.168.76.107','192.168.69.112','192.168.65.14','192.168.64.111','172.21.0.254']
+_cam_list = ['192.168.62.114','172.21.0.223','172.21.0.221','192.168.74.115','192.168.72.116','172.21.0.224','172.21.0.243','192.168.60.139','192.168.76.108','192.168.77.115','192.168.76.107','192.168.69.112','192.168.65.14','192.168.64.111','172.21.0.254']
 
 #open nvr 198
 def open_admin_198():
@@ -39,7 +39,8 @@ def open_admin_198():
       #chrome_options.add_argument("--incognito")
       chrome_options.add_experimental_option("detach", True)
       global driver_198
-      driver_198 = webdriver.Chrome(options=chrome_options)
+      # driver_198 = webdriver.Chrome(options=chrome_options)
+      driver_198 = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
       #set position and size
       driver_198.set_window_size(1152, 648)
       driver_198.set_window_position(x, y)

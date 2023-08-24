@@ -6,8 +6,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import mysql.connector
 import time
 import requests
-#from selenium.webdriver.chrome.service import Service
-#from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 #web elements for page 200
 username_input_element = '//*[@id="portal"]/div/div/div/div[2]/div/div/form/div[1]/div/div/input'
@@ -31,7 +31,7 @@ y = 390
 
 #list of cam to ignore
 #add more ip if desired to be ignore
-_cam_list = []
+_cam_list = ['192.168.69.109','	192.168.69.120','192.168.69.121']
 #'172.21.0.74','172.21.0.216,'192.168.69.107','192.168.69.108','192.168.69.111'
 _to_ignore_log = []
 
@@ -43,7 +43,8 @@ def open_admin_200():
       #chrome_options.add_argument("--incognito")
       chrome_options.add_experimental_option("detach", True)
       global driver_200
-      driver_200 = webdriver.Chrome(options=chrome_options)
+      # driver_200 = webdriver.Chrome(options=chrome_options)
+      driver_200 = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
       #set position and size
       driver_200.set_window_size(1152, 648)
       driver_200.set_window_position(x, y)
