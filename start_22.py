@@ -78,7 +78,7 @@ def open_admin_22():
       # driver22 = webdriver.Chrome(options=chrome_options)
       driver22 = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
       #set position and size
-      driver22.set_window_size(1152, 648)
+      driver22.set_window_size(800, 600)
       driver22.set_window_position(x, y)
       driver22.get(nvr_ip)
       login_22()
@@ -86,14 +86,13 @@ def open_admin_22():
       time.sleep(timeout)
       #run 24/7
       while True:
-         # scan()
          open_image()
          #check if viewer got logged out
          if driver22.current_url != 'http://192.168.220.22/doc/page/config.asp':
             print('logged out...', True)
             login_22()
          #wait 5:00 sesc before refresh page
-         time.sleep(30)
+         time.sleep(1800)
          #refresh page
          driver22.refresh()
          time.sleep(30)
@@ -141,8 +140,6 @@ def loop_cams_rename():
          print(name)
          print(name[6:])
          switch(name[0:5],name[6:])
-
-
 
 def switch(arg,cam_name):
    if arg == "[D1]" and cam_name != d1:

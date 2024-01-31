@@ -1,0 +1,196 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import Select
+
+#web elements
+login_button_element = '//*[@id="login"]/table/tbody/tr/td[2]/div/div[5]/button'
+
+config_element = '//*[@id="nav"]/li[5]/a'
+
+camera_management_element = '//*[@id="menu"]/div/div[2]/div[5]/span'
+
+image_element = '//*[@id="menu"]/div/div[5]/div'
+
+osd = '//*[@id="image"]/li[2]'
+
+osd_dropdown = '//*[@id="osd"]/div[1]/div[1]/span[2]/select'
+
+camera_input = '//*[@id="osd"]/div[1]/div[2]/span[2]/div[3]/span[2]/input'
+
+save_button = '//*[@id="osd"]/div[2]/span[2]/button/span[2]'
+
+dropdown = '//*[@id="osd"]/div[1]/div[1]/span[2]/select/option'
+
+cam_names = ['KIDDIE POOL/TENT ENTRANCE','KIDDIE POOL (LOCKER 2) ','COMMISARRY KITCHEN','OLIVER OUTSIDE','PIRACHUTE LANDING','LOCKER 1 OUTSIDE','LOCKER 1','BRIDGE 1',"Employees' Locker Room",'Cyclone Hallway','TREASURE ISLAND','Pirates Den Area','CYCLONE GATE','POWERHOUSE CONTROL ROOM','POWER HOUSE 2','POWER HOUSE 1','CYCLONE LANDING','Spyglass Counter','Olivers Cafe','ROUNDABOUT 2','ROUNDABOUT 3','LAZY RIVER HALLWAY','BUCCANNER LW']
+d1 = 'KIDDIE POOL/TENT ENTRANCE'
+d2 = 'KIDDIE POOL (LOCKER 2) '
+d3 = 'COMMISARRY KITCHEN'
+d4 = 'OLIVER OUTSIDE'
+d5 = 'PIRACHUTE LANDING'
+d6 = 'LOCKER 1 OUTSIDE'
+d7 = 'LOCKER 1'
+d8 = 'BRIDGE 1'
+d9 = "Employees' Locker Room"
+d10 = 'Cyclone Hallway'
+d11 = 'TREASURE ISLAND'
+d12 = 'Pirates Den Area'
+d13 = 'CYCLONE GATE'
+d14 = 'POWERHOUSE CONTROL ROOM'
+d15 = 'POWER HOUSE 2'
+d16 = 'POWER HOUSE 1'
+d17 = 'CYCLONE LANDING'
+d18 = 'Spyglass Counter'
+d19 = "ROUNDABOUT 1"
+d20 = 'ROUNDABOUT 2'
+d21 = 'ROUNDABOUT 3'
+d22 = 'LAZY RIVER HALLWAY'
+d23 = 'BUCCANNER LW'
+
+timeout = 5
+# x = 770
+# y = 390
+x = 0
+y = 350
+
+#open nvr 19
+def open_admin_19():
+    nvr_ip = 'http://192.168.220.19'
+    try:
+        chrome_options = Options()
+        #chrome_options.add_argument("--incognito")
+        chrome_options.add_experimental_option("detach", True)
+        global driver19
+        # driver19 = webdriver.Chrome(options=chrome_options)
+        driver19 = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
+        #set position and size
+        driver19.set_window_size(800, 600)
+        driver19.set_window_position(x, y)
+        driver19.get(nvr_ip)
+        login_19()
+        # open_image()
+        time.sleep(timeout)
+        #run 24/7
+        while True:
+            open_image()
+            #check if viewer got logged out
+            if driver19.current_url != 'http://192.168.220.19/doc/page/config.asp':
+                print('logged out...', True)
+                login_19()
+            #wait 5:00 sesc before refresh page
+            time.sleep(30)
+            #refresh page
+            driver19.refresh()
+            time.sleep(30)
+    except Exception as e:
+        print('admin 19',e)
+        #driver19.close()
+        driver19.quit()
+        open_admin_19()
+
+def login_19():
+    print('logging in 19...')
+    nvr_username = 'autocctv'
+    nvr_password = '4zmSPrg@'
+    time.sleep(timeout)
+    wait_for_element_load(login_button_element,driver19)
+    driver19.find_element(By.ID,'username').send_keys(nvr_username)
+    driver19.find_element(By.ID,'password').send_keys(nvr_password)
+    driver19.find_element(By.XPATH,login_button_element).click()
+    wait_for_element_load(config_element,driver19)
+    driver19.find_element(By.XPATH, config_element).click()
+    time.sleep(timeout)
+
+def open_image():
+    time.sleep(timeout)
+    wait_for_element_load(image_element,driver19)
+    driver19.find_element(By.XPATH,image_element).click()
+    time.sleep(timeout)
+    wait_for_element_load(osd,driver19)
+    driver19.find_element(By.XPATH,osd).click()
+    time.sleep(timeout)
+    loop_cams_rename()
+
+def loop_cams_rename():
+    select = Select(driver19.find_element(By.XPATH,osd_dropdown))
+    time.sleep(timeout)
+    print(len(select.options))
+    for i in range(len(select.options)):
+        select.select_by_index(i)
+        name = driver19.find_element(By.XPATH,dropdown + str([i+1])).text
+        print(name)
+        switch(name)
+
+def switch(arg):
+    if arg == "IP Camera1":
+        new_name(d1)
+    elif arg == "IP Camera2":
+        new_name(d2)
+    elif arg == "IP Camera3":
+        new_name(d3)
+    elif arg == "IP Camera4":
+        new_name(d4)
+    elif arg == "IP Camera5":
+        new_name(d5)
+    elif arg == "IP Camera6":
+        new_name(d6)
+    elif arg == "IP Camera7":
+        new_name(d7)
+    elif arg == "IP Camera8":
+        new_name(d8)
+    elif arg == "IP Camera9":
+        new_name(d9)
+    elif arg == "IP Camera10":
+        new_name(d10)
+    elif arg == "IP Camera11":
+        new_name(d11)
+    elif arg == "IP Camera12":
+        new_name(d12)
+    elif arg == "IP Camera13":
+        new_name(d13)
+    elif arg == "IP Camera14":
+        new_name(d14)
+    elif arg == "IP Camera15":
+        new_name(d15)
+    elif arg == "IP Camera16":
+        new_name(d16)
+    elif arg == "IP Camera17":
+        new_name(d17)
+    elif arg == "IP Camera18":
+        new_name(d18)
+    elif arg == "IP Camera19":
+        new_name(d19)
+    elif arg == "IP Camera20":
+        new_name(d20)
+    elif arg == "IP Camera21":
+        new_name(d21)
+    elif arg == "IP Camera22":
+        new_name(d22)
+    elif arg == "IP Camera23":
+        new_name(d23)
+
+def new_name(d_number):
+    # time.sleep(timeout)
+    wait_for_element_load(camera_input,driver19)
+    camera_name = driver19.find_element(By.XPATH,camera_input).get_attribute('value')
+    print(camera_name + ' | ' + d_number)
+    if(camera_name != d_number):
+        # print('rename')
+        driver19.find_element(By.XPATH,camera_input).click()
+        driver19.find_element(By.XPATH,camera_input).clear()
+        driver19.find_element(By.XPATH,camera_input).send_keys(d_number)
+        driver19.find_element(By.XPATH,save_button).click()
+        time.sleep(timeout)
+
+#function to ensure web element loaded
+def wait_for_element_load(element, driver):
+    element_wait_load = EC.presence_of_element_located((By.XPATH, element))
+    WebDriverWait(driver, 10).until(element_wait_load)
+    time.sleep(timeout)
+      
+open_admin_19()
