@@ -83,7 +83,7 @@ def open_admin_19():
                 print('logged out...', True)
                 login_19()
             #wait 5:00 sesc before refresh page
-            time.sleep(30)
+            time.sleep(1800)
             #refresh page
             driver19.refresh()
             time.sleep(30)
