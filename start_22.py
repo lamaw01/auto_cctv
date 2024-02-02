@@ -19,6 +19,8 @@ camera_management_element = '//*[@id="menu"]/div/div[2]/div[5]/span'
 
 image_element = '//*[@id="menu"]/div/div[5]/div'
 
+system_element = '//*[@id="menu"]/div/div[2]/div[1]'
+
 osd = '//*[@id="image"]/li[2]'
 
 osd_dropdown = '//*[@id="osd"]/div[1]/div[1]/span[2]/select'
@@ -31,9 +33,11 @@ dropdown = '//*[@id="osd"]/div[1]/div[1]/span[2]/select/option'
 
 #base row
 table_row = '//*[@id="tableDigitalChannels"]/div/div[2]/div'
+table_row2 ='//*[@id="tableDigitalChannels"]/div/div[2]/div[2]'
 #/span[3] -> camera name
 #/span[4] -> camera ip
 #/span[8] -> camera status
+
 
 _cam_list = []
 
@@ -97,8 +101,12 @@ def open_admin_22():
       #run 24/7
       while True:
          # open_image()
+         open_image()
+         time.sleep(30)
          scan()
          #check if viewer got logged out
+         # print(driver22.current_url,'current_url')
+         # http://192.168.220.22/doc/page/config.asp
          if driver22.current_url != 'http://192.168.220.22/doc/page/config.asp':
             print('logged out...', True)
             login_22()
@@ -135,6 +143,10 @@ def open_image():
    driver22.find_element(By.XPATH,osd).click()
    time.sleep(timeout)
    loop_cams_rename()
+   time.sleep(timeout)
+   wait_for_element_load(system_element,driver22)
+   driver22.find_element(By.XPATH,system_element).click()
+   time.sleep(timeout)
 
 def loop_cams_rename():
    select = Select(driver22.find_element(By.XPATH,osd_dropdown))
@@ -229,6 +241,10 @@ def new_name(d_number):
 
 #check table if there's offline
 def scan():
+   time.sleep(timeout)
+   wait_for_element_load(camera_management_element,driver22)
+   driver22.find_element(By.XPATH,camera_management_element).click()
+   time.sleep(timeout)
    print('scanning22...')
    camera_count = 0
    is_tail = False
@@ -254,13 +270,13 @@ def reboot(ip,name):
    status = True
    try:
       #http://admin:scores135792468@192.168.64.112/ISAPI/System/reboot
-      response = requests.put('http://'+ip+'/ISAPI/System/reboot',auth=('admin','123456@ad'))
+      response = requests.put('http://'+ip+'/ISAPI/System/reboot',auth=('admin','camng7seas'))
       print('1st req',response.status_code)
       time.sleep(10)
-      if response.status_code != 200:
-         time.sleep(10)
-         response = requests.put('http://'+ip+'/ISAPI/System/reboot',auth=('admin','scores135792468'))
-         print('2st req',response.status_code)
+      # if response.status_code != 200:
+      #    time.sleep(10)
+      #    response = requests.put('http://'+ip+'/ISAPI/System/reboot',auth=('admin','scores135792468'))
+      #    print('2st req',response.status_code)
    except Exception as e:
       print('reboot',e)
       status = False
