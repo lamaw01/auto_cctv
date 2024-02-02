@@ -3,7 +3,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import mysql.connector
 import time
+import requests
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import Select
@@ -26,6 +28,14 @@ camera_input = '//*[@id="osd"]/div[1]/div[2]/span[2]/div[3]/span[2]/input'
 save_button = '//*[@id="osd"]/div[2]/span[2]/button/span[2]'
 
 dropdown = '//*[@id="osd"]/div[1]/div[1]/span[2]/select/option'
+
+#base row
+table_row = '//*[@id="tableDigitalChannels"]/div/div[2]/div'
+#/span[3] -> camera name
+#/span[4] -> camera ip
+#/span[8] -> camera status
+
+_cam_list = []
 
 cam_names = ['Photo Booth 1','LOCKER 2','Ticketing area 1','Biometric','Family Gate / Locker 1','Plank Drop Release','RIVER ENTRANCE','PIRATES MARKET','Tower 1 Slipper Rack','TICKETING2','Tower 1 Release Area','CCTV MAIN GATE','MAINGATE','TENT ENTRACE','Pirates Market Counter','Commissary Extension','Events Tent','Infirmary','Olivers Cafe','Receiving','Entrance Waiting Area','Riptide Reef Release','AHOY COUNTER','PIRATES DEN','JOLLY TOWER','BRIDGE 2','HR OFFICE CCTV','FAMILY OFFICE','TURNSTYLE','Riptide Landing','BUCCANEER JRT','JT HALLWAY']
 d1 = 'Photo Booth 1'
@@ -86,7 +96,8 @@ def open_admin_22():
       time.sleep(timeout)
       #run 24/7
       while True:
-         open_image()
+         # open_image()
+         scan()
          #check if viewer got logged out
          if driver22.current_url != 'http://192.168.220.22/doc/page/config.asp':
             print('logged out...', True)
@@ -215,6 +226,69 @@ def new_name(d_number):
    driver22.find_element(By.XPATH,camera_input).send_keys(d_number)
    driver22.find_element(By.XPATH,save_button).click()
    time.sleep(timeout)
+
+#check table if there's offline
+def scan():
+   print('scanning22...')
+   camera_count = 0
+   is_tail = False
+   while is_tail is False:
+      try:
+         #click row
+         driver22.find_element(By.XPATH,table_row + str([camera_count+1])).click()
+         camera_count = camera_count + 1
+         #get name and status of current row
+         camera_name = driver22.find_element(By.XPATH,table_row + str([camera_count]) + '/span[3]').text
+         camera_ip = driver22.find_element(By.XPATH,table_row + str([camera_count])  + '/span[4]').text
+         camera_status = driver22.find_element(By.XPATH,table_row + str([camera_count]) + '/span[8]').text
+         #if offline, get ip and reboot
+         if not _cam_list.__contains__(camera_ip) and camera_status != 'Online':
+            print('rebooting22...',camera_name)
+            reboot(camera_ip,camera_name)
+      except Exception as e:
+         is_tail = True
+         print('scan22',e)
+   print('standby22...')
+
+def reboot(ip,name):
+   status = True
+   try:
+      #http://admin:scores135792468@192.168.64.112/ISAPI/System/reboot
+      response = requests.put('http://'+ip+'/ISAPI/System/reboot',auth=('admin','123456@ad'))
+      print('1st req',response.status_code)
+      time.sleep(10)
+      if response.status_code != 200:
+         time.sleep(10)
+         response = requests.put('http://'+ip+'/ISAPI/System/reboot',auth=('admin','scores135792468'))
+         print('2st req',response.status_code)
+   except Exception as e:
+      print('reboot',e)
+      status = False
+   finally:
+      insert_log(ip,name,status,22)
+
+def insert_log(ip,name,rebooted,nvr):
+   try:
+      #connect db
+      _mydb = mysql.connector.connect(
+         host="172.21.3.25",
+         database="autocctv",
+         user="autocctv",
+         password="autocctv123"
+      )
+      cursor = _mydb.cursor()
+      #insert query
+      sql = "INSERT INTO logs (ip,name,rebooted,nvr) VALUES (%s,%s,%s,%s)"
+      val = (ip,name,rebooted,nvr)
+      cursor.execute(sql, val)
+      _mydb.commit()
+      print(cursor.rowcount, "record inserted.")
+   except mysql.connector.Error as err:
+      print('insert_log',err)
+   finally:
+      #close connection
+      cursor.close()
+      _mydb.close()
 
 #function to ensure web element loaded
 def wait_for_element_load(element, driver):
