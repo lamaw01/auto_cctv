@@ -5,10 +5,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import mysql.connector
 import time
-import requests
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import TimeoutException
 
 #web elements
 login_button_element = '//*[@id="login"]/table/tbody/tr/td[2]/div/div[5]/button'
@@ -31,13 +31,17 @@ save_button = '//*[@id="osd"]/div[2]/span[2]/button/span[2]'
 
 dropdown = '//*[@id="osd"]/div[1]/div[1]/span[2]/select/option'
 
+maintenance = '//*[@id="menu"]/div/div[2]/div[3]/span'
+
+reboot_button = '//*[@id="maintainUpgrade"]/div[1]/div[2]/span[1]/button'
+
+reboot_ok_button = '//*[@id="config"]/div[1]/div/table/tbody/tr[2]/td[2]/div/table/tbody/tr[3]/td/div/button[1]'
+
 #base row
 table_row = '//*[@id="tableDigitalChannels"]/div/div[2]/div'
-table_row2 ='//*[@id="tableDigitalChannels"]/div/div[2]/div[2]'
 #/span[3] -> camera name
 #/span[4] -> camera ip
 #/span[8] -> camera status
-
 
 _cam_list = []
 
@@ -96,17 +100,13 @@ def open_admin_22():
       driver22.set_window_position(x, y)
       driver22.get(nvr_ip)
       login_22()
-      # open_image()
       time.sleep(timeout)
       #run 24/7
       while True:
-         # open_image()
          open_image()
          time.sleep(30)
          scan()
          #check if viewer got logged out
-         # print(driver22.current_url,'current_url')
-         # http://192.168.220.22/doc/page/config.asp
          if driver22.current_url != 'http://192.168.220.22/doc/page/config.asp':
             print('logged out...', True)
             login_22()
@@ -269,18 +269,43 @@ def scan():
 def reboot(ip,name):
    status = True
    try:
-      #http://admin:scores135792468@192.168.64.112/ISAPI/System/reboot
-      response = requests.put('http://'+ip+'/ISAPI/System/reboot',auth=('admin','camng7seas'))
-      print('1st req',response.status_code)
-      time.sleep(10)
-      # if response.status_code != 200:
-      #    time.sleep(10)
-      #    response = requests.put('http://'+ip+'/ISAPI/System/reboot',auth=('admin','scores135792468'))
-      #    print('2st req',response.status_code)
+      chrome_options = Options()
+      chrome_options.add_experimental_option("detach", True)
+      global driverReboot
+      driverReboot = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
+      #set position and size
+      driverReboot.set_window_size(800, 600)
+      # driverReboot.set_window_position(x, y)
+      driverReboot.get('http://'+ip)
+      print('logging in ' + ip)
+      nvr_username = 'admin'
+      nvr_password = 'camng7seas'
+      time.sleep(timeout)
+      # element_present = EC.presence_of_element_located((By.XPATH, login_button_element))
+      # WebDriverWait(driverReboot, timeout).until(element_present)
+      wait_for_element_load(login_button_element,driverReboot)
+      driverReboot.find_element(By.ID,'username').send_keys(nvr_username)
+      driverReboot.find_element(By.ID,'password').send_keys(nvr_password)
+      driverReboot.find_element(By.XPATH,login_button_element).click()
+      wait_for_element_load(config_element,driverReboot)
+      driverReboot.find_element(By.XPATH, config_element).click()
+      time.sleep(timeout)
+      wait_for_element_load(maintenance,driverReboot)
+      driverReboot.find_element(By.XPATH,maintenance).click()
+      time.sleep(timeout)
+      wait_for_element_load(reboot_button,driverReboot)
+      driverReboot.find_element(By.XPATH,reboot_button).click()
+      time.sleep(timeout)
+      wait_for_element_load(reboot_ok_button,driverReboot)
+      driverReboot.find_element(By.XPATH,reboot_ok_button).click()
+      time.sleep(30)
+   except TimeoutException:
+      status = False
    except Exception as e:
       print('reboot',e)
       status = False
    finally:
+      driverReboot.quit()
       insert_log(ip,name,status,22)
 
 def insert_log(ip,name,rebooted,nvr):
@@ -313,3 +338,6 @@ def wait_for_element_load(element, driver):
    time.sleep(timeout)
       
 open_admin_22()
+
+# reboot('192.168.220.64','Photo Booth 1')
+# reboot('192.168.220.38','JT HALLWAY')
