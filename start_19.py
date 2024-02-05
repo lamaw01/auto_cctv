@@ -281,7 +281,7 @@ def scan():
             camera_count = camera_count + 1
             #get name and status of current row
             camera_name = driver19.find_element(By.XPATH,table_row + str([camera_count]) + '/span[3]').text
-            camera_ip = driver19.find_element(By.XPATH,table_row + str([camera_count])  + '/span[4]').text
+            camera_ip = driver19.find_element(By.XPATH,table_row + str([camera_count])  + '/span[3]').text
             camera_status = driver19.find_element(By.XPATH,table_row + str([camera_count]) + '/span[8]').text
             #if offline, get ip and reboot
             if not _cam_list.__contains__(camera_ip) and camera_status != 'Online':
