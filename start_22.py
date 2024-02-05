@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import mysql.connector
 import time
+import pandas as pd
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import Select
@@ -85,6 +86,77 @@ timeout = 5
 x = 0
 y = 10
 
+def assign_excel_data():
+   try:
+      excel_data = pd.read_excel('cctv_data.xlsx', sheet_name='22',usecols="A")
+      global d1
+      d1 = excel_data.values[0][0]
+      global d2
+      d2 = excel_data.values[1][0]
+      global d3
+      d3 = excel_data.values[2][0]
+      global d4
+      d4 = excel_data.values[3][0]
+      global d5
+      d5 = excel_data.values[4][0]
+      global d6
+      d6 = excel_data.values[5][0]
+      global d7
+      d7 = excel_data.values[6][0]
+      global d8
+      d8 = excel_data.values[7][0]
+      global d9
+      d9 = excel_data.values[8][0]
+      global d10
+      d10 = excel_data.values[9][0]
+      global d11
+      d11 = excel_data.values[10][0]
+      global d12
+      d12 = excel_data.values[11][0]
+      global d13
+      d13 = excel_data.values[12][0]
+      global d14
+      d14 = excel_data.values[13][0]
+      global d15
+      d15 = excel_data.values[14][0]
+      global d16
+      d16 = excel_data.values[15][0]
+      global d17
+      d17 = excel_data.values[16][0]
+      global d18
+      d18 = excel_data.values[17][0]
+      global d19
+      d19 = excel_data.values[18][0]
+      global d20
+      d20 = excel_data.values[19][0]
+      global d21
+      d21 = excel_data.values[20][0]
+      global d22
+      d22 = excel_data.values[21][0]
+      global d23
+      d23 = excel_data.values[22][0]
+      global d24
+      d24 = excel_data.values[23][0]
+      global d25
+      d25 = excel_data.values[24][0]
+      global d26
+      d26 = excel_data.values[25][0]
+      global d27
+      d27 = excel_data.values[26][0]
+      global d28
+      d28 = excel_data.values[27][0]
+      global d29
+      d29 = excel_data.values[28][0]
+      global d30
+      d30 = excel_data.values[29][0]
+      global d31
+      d31 = excel_data.values[30][0]
+      global d32
+      d32 = excel_data.values[31][0]
+
+   except Exception as e:
+      print('assign_excel_data',e)
+
 #open nvr 22
 def open_admin_22():
    nvr_ip = 'http://192.168.220.22'
@@ -101,6 +173,7 @@ def open_admin_22():
       driver22.get(nvr_ip)
       login_22()
       time.sleep(timeout)
+      assign_excel_data()
       #run 24/7
       while True:
          open_image()
@@ -338,6 +411,3 @@ def wait_for_element_load(element, driver):
    time.sleep(timeout)
       
 open_admin_22()
-
-# reboot('192.168.220.64','Photo Booth 1')
-# reboot('192.168.220.38','JT HALLWAY')
