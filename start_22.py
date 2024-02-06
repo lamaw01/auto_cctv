@@ -239,77 +239,78 @@ def loop_cams_rename():
 
 def switch(arg,cam_name):
    if arg == "[D1]" and cam_name != d1:
-      new_name(d1)
+      new_name(d1,arg)
    elif arg == "[D2]" and cam_name != d2:
-      new_name(d2)
+      new_name(d2,arg)
    elif arg == "[D3]" and cam_name != d3:
-      new_name(d3)
+      new_name(d3,arg)
    elif arg == "[D4]" and cam_name != d4:
-      new_name(d4)
+      new_name(d4,arg)
    elif arg == "[D5]" and cam_name != d5:
-      new_name(d5)
+      new_name(d5,arg)
    elif arg == "[D6]" and cam_name != d6:
-      new_name(d6)
+      new_name(d6,arg)
    elif arg == "[D7]" and cam_name != d7:
-      new_name(d7)
+      new_name(d7,arg)
    elif arg == "[D8]" and cam_name != d8:
-      new_name(d8)
+      new_name(d8,arg)
    elif arg == "[D9]" and cam_name != d9:
-      new_name(d9)
+      new_name(d9,arg)
    elif arg == "[D10]" and cam_name != d10:
-      new_name(d10)
+      new_name(d10,arg)
    elif arg == "[D11]" and cam_name != d11:
-      new_name(d11)
+      new_name(d11,arg)
    elif arg == "[D12]" and cam_name != d12:
-      new_name(d12)
+      new_name(d12,arg)
    elif arg == "[D13]" and cam_name != d13:
-      new_name(d13)
+      new_name(d13,arg)
    elif arg == "[D14]" and cam_name != d14:
-      new_name(d14)
+      new_name(d14,arg)
    elif arg == "[D15]" and cam_name != d15:
-      new_name(d15)
+      new_name(d15,arg)
    elif arg == "[D16]" and cam_name != d16:
-      new_name(d16)
+      new_name(d16,arg)
    elif arg == "[D17]" and cam_name != d17:
-      new_name(d17)
+      new_name(d17,arg)
    elif arg == "[D18]" and cam_name != d18:
-      new_name(d18)
+      new_name(d18,arg)
    elif arg == "[D19]" and cam_name != d19:
-      new_name(d19)
+      new_name(d19,arg)
    elif arg == "[D20]" and cam_name != d20:
-      new_name(d20)
+      new_name(d20,arg)
    elif arg == "[D21]" and cam_name != d21:
-      new_name(d21)
+      new_name(d21,arg)
    elif arg == "[D22]" and cam_name != d22:
-      new_name(d22)
+      new_name(d22,arg)
    elif arg == "[D23]" and cam_name != d23:
-      new_name(d23)
+      new_name(d23,arg)
    elif arg == "[D24]" and cam_name != d24:
-      new_name(d24)
+      new_name(d24,arg)
    elif arg == "[D25]" and cam_name != d25:
-      new_name(d25)
+      new_name(d25,arg)
    elif arg == "[D26]" and cam_name != d26:
-      new_name(d26)
+      new_name(d26,arg)
    elif arg == "[D27]" and cam_name != d27:
-      new_name(d27)
+      new_name(d27,arg)
    elif arg == "[D28]" and cam_name != d28:
-      new_name(d28)
+      new_name(d28,arg)
    elif arg == "[D29]" and cam_name != d29:
-      new_name(d29)
+      new_name(d29,arg)
    elif arg == "[D30]" and cam_name != d30:
-      new_name(d30)
+      new_name(d30,arg)
    elif arg == "[D31]" and cam_name != d31:
-      new_name(d31)
+      new_name(d31,arg)
    elif arg == "[D32]" and cam_name != d32:
-      new_name(d32)
+      new_name(d32,arg)
 
-def new_name(d_number):
+def new_name(d_number,arg):
    time.sleep(timeout)
    wait_for_element_load(camera_input,driver22)
    driver22.find_element(By.XPATH,camera_input).click()
    driver22.find_element(By.XPATH,camera_input).clear()
    driver22.find_element(By.XPATH,camera_input).send_keys(d_number)
    driver22.find_element(By.XPATH,save_button).click()
+   insert_log(arg,d_number,2,22)
    time.sleep(timeout)
 
 #check table if there's offline

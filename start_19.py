@@ -252,8 +252,8 @@ def switch(arg):
     elif arg == "IP Camera23":
         new_name(d23)
 
-def new_name(d_number):
-    # time.sleep(timeout)
+def new_name(d_number,arg):
+    time.sleep(timeout)
     wait_for_element_load(camera_input,driver19)
     camera_name = driver19.find_element(By.XPATH,camera_input).get_attribute('value')
     print(camera_name + ' | ' + d_number)
@@ -263,6 +263,7 @@ def new_name(d_number):
         driver19.find_element(By.XPATH,camera_input).clear()
         driver19.find_element(By.XPATH,camera_input).send_keys(d_number)
         driver19.find_element(By.XPATH,save_button).click()
+        insert_log(arg,d_number,2,19)
         time.sleep(timeout)
 
 #check table if there's offline
