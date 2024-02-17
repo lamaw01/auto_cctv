@@ -206,51 +206,51 @@ def loop_cams_rename():
 
 def switch(arg):
     if arg == "IP Camera1":
-        new_name(d1)
+        new_name(d1,arg)
     elif arg == "IP Camera2":
-        new_name(d2)
+        new_name(d2,arg)
     elif arg == "IP Camera3":
-        new_name(d3)
+        new_name(d3,arg)
     elif arg == "IP Camera4":
-        new_name(d4)
+        new_name(d4,arg)
     elif arg == "IP Camera5":
-        new_name(d5)
+        new_name(d5,arg)
     elif arg == "IP Camera6":
-        new_name(d6)
+        new_name(d6,arg)
     elif arg == "IP Camera7":
-        new_name(d7)
+        new_name(d7,arg)
     elif arg == "IP Camera8":
-        new_name(d8)
+        new_name(d8,arg)
     elif arg == "IP Camera9":
-        new_name(d9)
+        new_name(d9,arg)
     elif arg == "IP Camera10":
-        new_name(d10)
+        new_name(d1,arg)
     elif arg == "IP Camera11":
-        new_name(d11)
+        new_name(d11,arg)
     elif arg == "IP Camera12":
-        new_name(d12)
+        new_name(d12,arg)
     elif arg == "IP Camera13":
-        new_name(d13)
+        new_name(d13,arg)
     elif arg == "IP Camera14":
-        new_name(d14)
+        new_name(d14,arg)
     elif arg == "IP Camera15":
-        new_name(d15)
+        new_name(d15,arg)
     elif arg == "IP Camera16":
-        new_name(d16)
+        new_name(d16,arg)
     elif arg == "IP Camera17":
-        new_name(d17)
+        new_name(d17,arg)
     elif arg == "IP Camera18":
-        new_name(d18)
+        new_name(d18,arg)
     elif arg == "IP Camera19":
-        new_name(d19)
+        new_name(d19,arg)
     elif arg == "IP Camera20":
-        new_name(d20)
+        new_name(d20,arg)
     elif arg == "IP Camera21":
-        new_name(d21)
+        new_name(d21,arg)
     elif arg == "IP Camera19":
-        new_name(d22)
+        new_name(d22,arg)
     elif arg == "IP Camera23":
-        new_name(d23)
+        new_name(d23,arg)
 
 def new_name(d_number,arg):
     time.sleep(timeout)
