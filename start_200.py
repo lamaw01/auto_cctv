@@ -43,8 +43,8 @@ def open_admin_200():
       #chrome_options.add_argument("--incognito")
       chrome_options.add_experimental_option("detach", True)
       global driver_200
-      # driver_200 = webdriver.Chrome(options=chrome_options)
-      driver_200 = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
+      driver_200 = webdriver.Chrome(options=chrome_options)
+      # driver_200 = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
       #set position and size
       driver_200.set_window_size(1152, 648)
       driver_200.set_window_position(x, y)
